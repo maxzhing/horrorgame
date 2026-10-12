@@ -9197,7 +9197,7 @@ const Game = {
       else if (f.type === 'main') f.on = this.power && f.mode !== 'dead' && t >= f.powerOnAt;
       if (f.on) {
         b = 1;
-        if (f.mode === 'flicker') { f.next -= dt; if (f.next <= 0) { f.burst = rand(0.15, 1.3); f.next = rand(2.5, 9); } if (f.burst > 0) { f.burst -= dt; b = Math.random() < 0.5 ? rand(0, 0.25) : 1; } }
+        if (f.mode === 'flicker' && this.mode !== 'watch') { f.next -= dt; if (f.next <= 0) { f.burst = rand(0.15, 1.3); f.next = rand(2.5, 9); } if (f.burst > 0) { f.burst -= dt; b = Math.random() < 0.5 ? rand(0, 0.25) : 1; } }
         else if (f.mode === 'beacon') b = 0.15 + 0.85 * Math.pow(Math.max(0, Math.sin(t * 5.5 + f.pos.x)), 6);
         if (f.pop > 0) { f.pop -= dt; b *= Math.random() < 0.75 ? 0 : 0.35; } // a bulb blown by the Warden
         if (f.type === 'main' && t < f.powerOnAt + 0.7) b *= Math.random() < 0.5 ? 0.15 : 1;
@@ -17017,8 +17017,6 @@ const CODES = {
   HELLOMAX: { ult: 1, text: 'a free ULTIMATE spin — a guaranteed ULTIMATE character' },
   HELLORYAN: { ryan: 1, text: 'a free spin: 50% a SPECIAL, 50% an ULTIMATE' },
   HELLOHIRSCH: { coins: 10000, text: '+10,000 coins' },
-  HELLOOWNER123456789: { owner: 1, text: 'OWNER ACCESS: every character, max coins, the 5× SPIN' },
-  HELLORESETALL: { reset: 1, text: 'everything reset — a brand-new save' },
 };
 // Build 18: PITY — a run of bad luck can't go on forever. Counted on the save, across every spin you ever make.
 // A spin that hasn't seen this rarity (or a better one) for this many spins in a row is guaranteed it;
@@ -17345,8 +17343,6 @@ const Chars = {
     if (C.spins) D.freeSpins = Math.min(ECON.maxFree, D.freeSpins + C.spins);
     if (C.ult) D.ultSpins = Math.min(ECON.maxFree, D.ultSpins + C.ult);
     if (C.ryan) D.ryanSpins = Math.min(ECON.maxFree, D.ryanSpins + C.ryan);
-    if (C.owner) { D.owned = CHAR_IDS.slice(); D.coins = ECON.maxCoins; D.multi = 1; }
-    if (C.reset) { this.data = this.fresh(); this.save(); return { ok: true, code: k, msg: 'Everything has been reset. You start again with ' + ECON.startCoins + ' coins and a free spin.' }; }
     this.save();
     return { ok: true, code: k, msg: k + ' — ' + C.text + '!' };
   },
@@ -25857,7 +25853,7 @@ const Hunt = {
     // you: no light, no hands to hold anything, nothing in the world to pick up
     p.hasFlash = false; p.flashState = false; p.maxHp = 100; p.health = 100; Chars.lastHp = 100; p.stamina = 1;
     flashItem.enabled = false; flashItem.visual.visible = false; flashItem.item.taken = true;
-    this.off = interactables.filter(d => d.enabled && d.kind !== 'locker'); this.off.forEach(d => { d.enabled = false; });
+    this.off = interactables.filter(d => d.enabled && d.kind !== 'locker' && d.kind !== 'door'); this.off.forEach(d => { d.enabled = false; }); // (the Warden keeps doors and lockers)
     Chars.cd = 0; Chars.ucd = ABIL.pounce.first; this.hudRedraw();
     // the real Warden sleeps tonight: you're it
     Monster.pos.set(52, 0, 8.5); if (Monster.model) Monster.model.visible = false;
@@ -26341,6 +26337,11 @@ const Hunt = {
   };
   const gr0 = Game.render; Game.render = function () {
     if (Hunt.on) { Hunt.drawWardens(); if (Monster.model && Monster.model.visible) Monster.model.visible = false; const fl = 'sepia(.55) hue-rotate(-28deg) saturate(2.1) brightness(1.3) contrast(1.06)'; if (renderer.domElement.style.filter !== fl) renderer.domElement.style.filter = fl; flash.intensity = 0; flashFill.color.setHex(0xc04a30); flashFill.intensity = 3.6; flashFill.distance = 26; flashFill.decay = 1; flashFill.position.copy(camera.position); }
+        if (Hunt.on && !Hunt.over) { // (Build 20: the Warden sees in the dark — thinner fog, brighter rooms, a longer reach on its own sight)
+      const fd = scene.fog.density, hi = hemi.intensity;
+      scene.fog.density = FOG_BASE * 0.35; hemi.intensity = Math.max(hi, 1.4); flashFill.intensity = 6; flashFill.distance = 40;
+      try { return gr0.apply(this, arguments); } finally { scene.fog.density = fd; hemi.intensity = hi; }
+    }
     return gr0.apply(this, arguments);
   };
   const tf0 = TimeFx.filter; TimeFx.filter = function (k) { if (Hunt.on) { const el = renderer.domElement, v = 'sepia(.55) hue-rotate(-28deg) saturate(2.1) brightness(1.3) contrast(1.06)'; if (el.style.filter !== v) el.style.filter = v; return; } return tf0.apply(this, arguments); };
