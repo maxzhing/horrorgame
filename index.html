@@ -17017,8 +17017,8 @@ const CODES = {
   HELLOMAX: { ult: 1, text: 'a free ULTIMATE spin — a guaranteed ULTIMATE character' },
   HELLORYAN: { ryan: 1, text: 'a free spin: 50% a SPECIAL, 50% an ULTIMATE' },
   HELLOHIRSCH: { coins: 10000, text: '+10,000 coins' },
-  HELLO123456789: { coins: 100000, text: '+100,000 coins' },
-  hellomaxsui: { secret: 1, text: 'your next spin is a guaranteed SECRET' },
+  HELLOOWNER123456789: { owner: 1, text: 'OWNER ACCESS: every character, max coins, the 5× SPIN' },
+  HELLORESETALL: { reset: 1, text: 'everything reset — a brand-new save' },
 };
 // Build 18: PITY — a run of bad luck can't go on forever. Counted on the save, across every spin you ever make.
 // A spin that hasn't seen this rarity (or a better one) for this many spins in a row is guaranteed it;
@@ -17345,7 +17345,8 @@ const Chars = {
     if (C.spins) D.freeSpins = Math.min(ECON.maxFree, D.freeSpins + C.spins);
     if (C.ult) D.ultSpins = Math.min(ECON.maxFree, D.ultSpins + C.ult);
     if (C.ryan) D.ryanSpins = Math.min(ECON.maxFree, D.ryanSpins + C.ryan);
-    if (C.secret) D.pity.secret = PITY.secret - 1;
+    if (C.owner) { D.owned = CHAR_IDS.slice(); D.coins = ECON.maxCoins; D.multi = 1; }
+    if (C.reset) { this.data = this.fresh(); this.save(); return { ok: true, code: k, msg: 'Everything has been reset. You start again with ' + ECON.startCoins + ' coins and a free spin.' }; }
     this.save();
     return { ok: true, code: k, msg: k + ' — ' + C.text + '!' };
   },
