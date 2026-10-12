@@ -17018,11 +17018,12 @@ const CODES = {
   HELLORYAN: { ryan: 1, text: 'a free spin: 50% a SPECIAL, 50% an ULTIMATE' },
   HELLOHIRSCH: { coins: 10000, text: '+10,000 coins' },
   HELLO123456789: { coins: 100000, text: '+100,000 coins' },
+  
 };
 // Build 18: PITY — a run of bad luck can't go on forever. Counted on the save, across every spin you ever make.
 // A spin that hasn't seen this rarity (or a better one) for this many spins in a row is guaranteed it;
 // and after ULTIMATE's soft start, every spin without one adds 0.5% to its odds.
-const PITY = { legendary: 10, mythic: 40, special: 90, ultimate: 500, secret: 1500 }; // (Build 20: SECRET is guaranteed within 1,500 spins)
+const PITY = { legendary: 10, mythic: 40, special: 90, ultimate: 500, secret: 5000 }; // (Build 20: SECRET is guaranteed within 1,500 spins)
 const PITY_IDS = ['legendary', 'mythic', 'special', 'ultimate', 'secret'];
 const PITY_SOFT = 400, PITY_SOFT_STEP = 0.5;
 const isCode = c => typeof c === 'string' && Object.prototype.hasOwnProperty.call(CODES, c);
