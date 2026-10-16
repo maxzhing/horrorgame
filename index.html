@@ -17579,14 +17579,14 @@ const CODES = {
   // Build 22
   HELLO123456789: { coins: 100000, text: '+100,000 coins' },
   HELLOSECRET: { coins: 50000, secret: 1, text: '+50,000 coins and a SECRET character' },
-  HELLOOWNER: { owner: 1, text: 'OWNER ACCESS: every character, max coins, the 5× SPIN' },
+  HELLOOWNERTHESIGMA: { owner: 1, text: 'OWNER ACCESS: every character, max coins, the 5× SPIN' },
   HELLORESETALL: { reset: 1, text: 'everything reset — a brand-new save' },
   HELLOHORSE: { char: 'horse', text: 'THE HORSE joins your roster — and you are now a horse' },
 };
 // Build 18: PITY — a run of bad luck can't go on forever. Counted on the save, across every spin you ever make.
 // A spin that hasn't seen this rarity (or a better one) for this many spins in a row is guaranteed it;
 // and after ULTIMATE's soft start, every spin without one adds 0.5% to its odds.
-const PITY = { legendary: 10, mythic: 40, special: 90, ultimate: 500, secret: 1500 }; // (Build 20: SECRET is guaranteed within 1,500 spins)
+const PITY = { legendary: 10, mythic: 40, special: 90, ultimate: 500, secret: 100000 }; // (Build 20: SECRET is guaranteed within 1,500 spins)
 const PITY_IDS = ['legendary', 'mythic', 'special', 'ultimate', 'secret'];
 const PITY_SOFT = 400, PITY_SOFT_STEP = 0.5;
 const isCode = c => typeof c === 'string' && Object.prototype.hasOwnProperty.call(CODES, c);
@@ -30393,6 +30393,7 @@ const Hotel = {
   },
   fixOn(f, t) {
     if (!f.own) { f.on = false; return; }
+    f.powerOnAt = -100; // (the hotel's lamps are simply on: no power-up stutter)
     const i = f.hroom;
     f.on = this.dressed && !this.dark.has(i) && !this.broken.has(i) && i <= this.fIdx + 1 && !this.allDark;
   },
